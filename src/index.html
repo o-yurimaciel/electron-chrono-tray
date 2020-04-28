@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <link rel="stylesheet" href="index.css" />
+  </head>
+  <body>
+    <h1>ChronoTray</h1>
+    <div id="chronoExample">
+      <div class="values">00:00:00</div>
+      <div class="btn-group">
+        <button class="startButton">Start</button>
+        <button class="pauseButton">Pause</button>
+        <button class="stopButton">Stop</button>
+        <button class="resetButton">
+          Restart
+        </button>
+      </div>
+    </div>
+    <script>
+      const { Timer } = require('easytimer.js');
+      const timer = new Timer();
+      const { ipcRenderer } = require('electron');
+
+      let timeUpdate;
+      let target25 = new Timer();
+
+      document
+        .querySelector('#chronoExample .startButton')
+        .addEventListener('click', function() {
+          timer.start();
+          target25.start({ precision: 'seconds', target: { seconds: 25 } });
+        });
+      document
+        .querySelector('#chronoExample .pauseButton')
+        .addEventListener('click', function() {
+          timer.pause();
+          target25.pause();
+        });
+      document
+        .querySelector('#chronoExample .stopButton')
+        .addEventListener('click', function() {
+          timer.stop();
+          target25.stop();
+        });
+      document
+        .querySelector('#chronoExample .resetButton')
+        .addEventListener('click', function() {
+          timer.reset();
+          target25.reset();
+        });
+      timer.addEventListener('secondsUpdated', function(e) {
+        timeUpdate = timer.getTimeValues().toString();
+        document.querySelector('#chronoExample .values').innerHTML = timeUpdate;
+        ipcRenderer.send('timeUpdate', timeUpdate);
+      });
+      timer.addEventListener('started', function(e) {
+        timeUpdate = timer.getTimeValues().toString();
+        document.querySelector('#chronoExample .values').innerHTML = timeUpdate;
+        ipcRenderer.send('timeUpdate', timeUpdate);
+      });
+      timer.addEventListener('reset', function(e) {
+        timeUpdate = timer.getTimeValues().toString();
+        document.querySelector('#chronoExample .values').innerHTML = timeUpdate;
+        ipcRenderer.send('timeUpdate', timeUpdate);
+      });
+
+      target25.addEventListener('targetAchieved', e => {
+        let notification = new Notification('ChronoTray', {
+          body: '25 seconds!',
+        });
+        target25.start({ precision: 'seconds', target: { seconds: 25 } });
+      });
+    </script>
+  </body>
+</html>
