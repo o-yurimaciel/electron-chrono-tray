@@ -2,7 +2,7 @@ const { Tray, Menu, app } = require('electron');
 
 const contextMenu = Menu.buildFromTemplate([
   {
-    label: 'Sair',
+    label: 'Quit',
     click: () => {
       app.quit();
     },
