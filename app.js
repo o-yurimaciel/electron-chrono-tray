@@ -88,14 +88,14 @@ app.on('ready', () => {
       mainWindow.hide();
     }, 200);
   });
-});
 
-if (isDev === false) {
-  autoUpdater.setFeedURL(feed)
-  setInterval(() => {
-    autoUpdater.checkForUpdates();
-  }, 60000);
-}
+  if (isDev === false) {
+    autoUpdater.setFeedURL(feed)
+    setInterval(() => {
+      autoUpdater.checkForUpdates();
+    }, 60000);
+  }
+});
 
 ipcMain.on('timeUpdate', (event, timeUpdate) => {
   if (process.platform === 'darwin') {
