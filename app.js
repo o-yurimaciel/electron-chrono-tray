@@ -1,4 +1,9 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, autoUpdater, dialog } = require('electron');
+
+const isDev = require('electron-is-dev');
+const server = 'http://download.localhost:4000';
+
+const feed = `${server}/update/${process.platform}/${app.getVersion()}`;
 
 const ChronoTray = require('./components/chronoTray');
 
@@ -85,10 +90,38 @@ app.on('ready', () => {
   });
 });
 
+if (isDev === false) {
+  autoUpdater.setFeedURL(feed)
+  setInterval(() => {
+    autoUpdater.checkForUpdates();
+  }, 60000);
+}
+
 ipcMain.on('timeUpdate', (event, timeUpdate) => {
   if (process.platform === 'darwin') {
     tray.setTitle(timeUpdate);
   } else {
     // tray.setTooltip(timeUpdate);
   }
+});
+
+autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
+  const dialogOpts = {
+    type: 'info',
+    buttons: [
+      'Restart now', 'Later'
+    ],
+    title: 'App update',
+    message: process.platform === 'win32' ? releaseNotes : releaseName,
+    detail: 'A new version was received, restart the application to install the update.'
+  }
+
+  dialog.showMessageBox(dialogOpts, (response) => {
+    if (response === 0) autoUpdater.quitAndInstall();
+  })
+});
+
+autoUpdater.on('error', message => {
+  console.error('There was an error on updating the app');
+  console.error(message);
 });
