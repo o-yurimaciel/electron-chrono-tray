@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="index.css" />
   </head>
   <body>
-    <h1>ChronoTray</h1>
+    <h1 id="title">ChronoTray</h1>
     <div id="chronoExample">
       <div class="values">00:00:00</div>
       <div class="btn-group">
@@ -24,10 +24,15 @@
     <script>
       const { Timer } = require('easytimer.js');
       const timer = new Timer();
-      const { ipcRenderer } = require('electron');
+      const { ipcRenderer, app } = require('electron');
+      const { version } = require('./package.json')
+
+      console.log(version);
 
       let timeUpdate;
       let target25 = new Timer();
+
+      document.querySelector('#title').innerHTML = `ChronoTray@${version}`
 
       document
         .querySelector('#chronoExample .startButton')
